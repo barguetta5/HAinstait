@@ -10,16 +10,22 @@
     <div class="container">
         <h1>ChatGPT-like Flask App</h1>
         <form id="chat-form">
-            <textarea id="user-input" name="user_input" rows="4" required></textarea>
+            <label for="user_id">ID:</label>
+            <input type="text" id="user_id" name="user_id" value="" >
+
+            <label for="username">User name:</label>
+            <input type="text" id="username" name="username" value="" >
+
+            <textarea id="user-input" name="user_input" rows="4" required placeholder="Type your message..."></textarea>
             <button type="submit">Send</button>
         </form>
+
         <div id="conversation" class="response"></div>
     </div>
 
     <script>
         document.getElementById('chat-form').onsubmit = async function(e) {
             e.preventDefault();
-            const userInput = document.getElementById('user-input').value;
             const conversationDiv = document.getElementById('conversation');
 
             const response = await fetch('/chat', {
@@ -27,13 +33,14 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: new URLSearchParams({ 'user_input': userInput })
+                body: new URLSearchParams(new FormData(e.target)) // This captures all form fields
             });
 
             const data = await response.json();
-            conversationDiv.innerHTML = data.conversation.join('<br>');
+            conversationDiv.innerHTML += `<strong>You:</strong> ${data.question}<br><strong>Bot:</strong> ${data.answer}<br>`;
             document.getElementById('user-input').value = '';
         };
     </script>
+
 </body>
 </html>

@@ -21,8 +21,7 @@ session = Session()
 # Define the ChatHistory model
 class ChatHistory(Base):
     __tablename__ = 'chat_history'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, primary_key=True)
     username = Column(String(100), nullable=False)
     question = Column(Text, nullable=False)
     answer = Column(Text, nullable=False)
@@ -51,8 +50,14 @@ def chat():
     chat_entry = ChatHistory(user_id=user_id, username=username, question=user_input, answer=response)
     session.add(chat_entry)
     session.commit()
-    result = results = session.query(ChatHistory).all()
+
+    # Print all the DB
+    results = session.query(ChatHistory).all()
     print(results)
+
+    # results = session.query(Users).filter(Users.ID == 123)
+    # for r in results:
+    #     print(r)
 
     return jsonify(question=user_input, answer=response)
 

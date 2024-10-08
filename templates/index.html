@@ -5,25 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPT-like Flask App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .form-container {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #chat-section {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #conversation {
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #e8f4fc;
+            flex: 1;
+            text-align: left;
+        }
+
+        .user-message {
+            text-align: left;
+            margin: 5px 0;
+            background-color: #d1e7dd;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .bot-message {
+            text-align: right;
+            margin: 5px 0;
+            background-color: #f8d7da;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        textarea {
+            resize: none;
+            height: 60px; /* Adjust height as needed */
+        }
+
+        #chat-history {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #f9f9f9;
+            text-align: left;
+            display: none; /* Initially hidden */
+            overflow-y: auto; /* Allow scrolling if necessary */
+            max-height: 200px; /* Limit height of history display */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>ChatGPT-like Flask App</h1>
-        <form id="chat-form">
-            <label for="user_id">ID:</label>
-            <input type="text" id="user_id" name="user_id" value="" >
 
-            <label for="username">User name:</label>
-            <input type="text" id="username" name="username" value="" >
+        <div id="user-info" class="form-container">
+            <form id="user-form">
+                <label for="user_id">ID:</label>
+                <input type="text" id="user_id" name="user_id" required>
 
-            <textarea id="user-input" name="user_input" rows="4" required placeholder="Type your message..."></textarea>
-            <button type="submit">Send</button>
-        </form>
+                <label for="username">User name:</label>
+                <input type="text" id="username" name="username" required>
 
-        <div id="conversation" class="response"></div>
+                <button type="submit">Log In</button>
+            </form>
+        </div>
+
+        <div id="chat-section" class="chat-container" style="display: none;">
+            <div id="conversation" class="response"></div>
+            <form id="chat-form">
+                <textarea id="user-input" name="user_input" rows="3" required placeholder="Type your message..."></textarea>
+                <button type="submit">Send</button>
+            </form>
+            <button id="fetch-history">Show Chat History</button>
+            <div id="chat-history"></div> <!-- Chat history section -->
+        </div>
     </div>
 
     <script>
+        let username = '';
+
+        // Handle user info submission
+        document.getElementById('user-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const response = await fetch('/set_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(new FormData(e.target))
+            });
+
+            const data = await response.json();
+            alert(data.message);
+            username = document.getElementById('username').value;
+            document.getElementById('user-info').style.display = 'none';
+            document.getElementById('chat-section').style.display = 'block';
+        };
+
+        // Handle chat submission
         document.getElementById('chat-form').onsubmit = async function(e) {
             e.preventDefault();
             const conversationDiv = document.getElementById('conversation');
@@ -33,14 +167,42 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: new URLSearchParams(new FormData(e.target)) // This captures all form fields
+                body: new URLSearchParams(new FormData(e.target))
             });
 
             const data = await response.json();
-            conversationDiv.innerHTML += `<strong>You:</strong> ${data.question}<br><strong>Bot:</strong> ${data.answer}<br>`;
+            conversationDiv.innerHTML += `<div class="user-message"><strong>${username}:</strong> ${data.question}</div>`;
+            conversationDiv.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.answer}</div>`;
             document.getElementById('user-input').value = '';
         };
-    </script>
 
+        // Fetch chat history
+        document.getElementById('fetch-history').onclick = async function() {
+            const response = await fetch('/get_chat_history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            const data = await response.json();
+            const chatHistoryDiv = document.getElementById('chat-history');
+            chatHistoryDiv.innerHTML = ''; // Clear previous history
+
+            if (data.length > 0) {
+                data.forEach(entry => {
+                    chatHistoryDiv.innerHTML += `<div class="user-message"><strong>You:</strong> ${entry.question}</div>`;
+                    chatHistoryDiv.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${entry.answer}</div>`;
+                });
+
+
+            } else {
+                chatHistoryDiv.innerHTML = '<div>No chat history found.</div>';
+            }
+
+            chatHistoryDiv.style.display = 'block'; // Show the chat history
+        };
+
+    </script>
 </body>
 </html>

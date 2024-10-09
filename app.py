@@ -4,8 +4,6 @@ from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, jsonify, session as flask_session
 from datetime import datetime
 from sqlalchemy.orm import declarative_base
-from alembic.config import Config
-from alembic import command
 from opneAI import ask_openai
 
 app = Flask(__name__)
@@ -22,9 +20,6 @@ db_session = Session()
 
 user_history = []
 
-# Create the database table if not exist
-Base.metadata.create_all(engine)
-
 
 # ChatHistory DB set another why by terminal running alembic.
 class ChatHistory(Base):
@@ -35,6 +30,10 @@ class ChatHistory(Base):
     answer = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+
+# Create the database table if not exist
+# above the class ChatHistory make some bugs with creating the DB
+Base.metadata.create_all(engine)
 
 # The implement with the front side
 @app.route('/')

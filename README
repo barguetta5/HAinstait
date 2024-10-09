@@ -1,0 +1,33 @@
+ChatGPT Web App using Flask
+This project requires user login before accessing ChatGPT. It helps track your interactions and copyright information.
+
+Features
+Login Page: The Flask server opens to a login page.
+ChatGPT Access: After logging in, users can interact with ChatGPT.
+Conversation History: Users can view their last conversation associated with their ID.
+Automatic Database Initialization: The database initializes automatically,
+but you need to modify the app.config in app.py to connect to your local PostgreSQL server.
+
+Testing
+To run the tests with pytest, execute the following command in your terminal:
+        pytest test_app.py
+
+Database Migrations with Alembic
+To manage database migrations, use the following commands:
+
+    To create a migration script:
+            alembic revision --autogenerate -m "your_message_here"
+    To run migrations:
+            alembic upgrade head
+
+OpenAI API Key
+The OpenAI API key is currently inserted in openAI.py, but it will be removed in future versions for security reasons.
+
+Application Structure
+app.py: This file handles the Flask server and manages the database.
+index.html: This file handles the form and parameters on the frontend, organizing the user interface effectively.
+style.css: This file is responsible for the design and styling of the application, defining the visual patterns.
+main.py: This is the entry point of the application, initializing the software.
+openAI.py: This file initializes the OpenAI interface and manages all user inputs for the chat functionality.
+
+

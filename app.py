@@ -1,79 +1,17 @@
-# from sqlalchemy import create_engine, Column, String, Integer, Text, DateTime
-# from sqlalchemy.ext.declarative import declarative_base
-# from sqlalchemy.orm import sessionmaker
-# from flask import Flask, render_template, request, jsonify
-# from datetime import datetime
-#
-# from opneAI import ask_openai
-#
-# app = Flask(__name__)
-#
-# # Change to your local or global database server
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:king1471@localhost/UsersFeedback'
-#
-# # Initialize SQLAlchemy
-# engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-# Base = declarative_base()
-# Session = sessionmaker(bind=engine)
-# session = Session()
-#
-#
-# # Define the ChatHistory model
-# class ChatHistory(Base):
-#     __tablename__ = 'chat_history'
-#     user_id = Column(Integer, primary_key=True)
-#     username = Column(String(100), nullable=False)
-#     question = Column(Text, nullable=False)
-#     answer = Column(Text, nullable=False)
-#     created_at = Column(DateTime, default=datetime.utcnow)
-#
-#
-# # Create the database tables if they don't exist
-# Base.metadata.create_all(engine)
-#
-#
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-#
-#
-# @app.route('/chat', methods=['POST'])
-# def chat():
-#     user_id = request.form['user_id']  # Assuming user_id is sent from the frontend
-#     username = request.form['username']  # Assuming username is sent from the frontend
-#     user_input = request.form['user_input']
-#
-#     # Generate response from OpenAI
-#     response = ask_openai(user_input)
-#
-#     # Save to database
-#     chat_entry = ChatHistory(user_id=user_id, username=username, question=user_input, answer=response)
-#     session.add(chat_entry)
-#     session.commit()
-#
-#
-#     return jsonify(question=user_input, answer=response)
-#
-#
-#
-#
-#
-# if __name__ == '__main__':
-#     app.run(debug=True)
-import random
-
-from sqlalchemy import create_engine, Column, String, Integer, Text, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+import pytest
+from sqlalchemy import create_engine, Column, String, Integer, Text, DateTime, inspect
 from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, jsonify, session as flask_session
 from datetime import datetime
-
-from opneAI import ask_openai  # Ensure this is correctly imported
+from sqlalchemy.orm import declarative_base
+from alembic.config import Config
+from alembic import command
+from opneAI import ask_openai
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Set a secret key for session management
+app.secret_key = 'your_secret_key'  # Not necessary for now
 
-# Change to your local or global database server
+# Have to change to your local or global database server
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:king1471@localhost/UsersFeedback'
 
 # Initialize SQLAlchemy
@@ -81,9 +19,14 @@ engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 db_session = Session()
+
 user_history = []
 
-# Define the ChatHistory model another option by terminal run alembic.
+# Create the database table if not exist
+Base.metadata.create_all(engine)
+
+
+# ChatHistory DB set another why by terminal running alembic.
 class ChatHistory(Base):
     __tablename__ = 'chat_history'
     user_id = Column(Integer, primary_key=True)
@@ -93,16 +36,12 @@ class ChatHistory(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
-
-# Create the database tables if they don't exist
-Base.metadata.create_all(engine)
-
-
+# The implement with the front side
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
+# Login pop up massage for user
 @app.route('/set_user', methods=['POST'])
 def set_user():
     user_id = request.form['user_id']
@@ -111,18 +50,18 @@ def set_user():
     # Check if the user already exists
     user_exists = db_session.query(ChatHistory).filter_by(user_id=user_id).first() is not None
 
-    # Set a pop up massage for user.
+    # Set a pop up massage for exist users or not exist users.
     if user_exists:
         flask_session['user_id'] = user_id
         flask_session['username'] = username
         return jsonify({"message": "User exists, proceed to chat."}), 200
     else:
-        # If the user doesn't exist, you might want to create a new entry here if needed.
         flask_session['user_id'] = user_id
         flask_session['username'] = username
         return jsonify({"message": "New user created, proceed to chat."}), 200
 
 
+@pytest.fixture
 @app.route('/chat', methods=['POST'])
 def chat():
     user_id = flask_session.get('user_id')  # Get user_id from session
@@ -151,6 +90,8 @@ def chat():
 
     return jsonify(question=user_input, answer=response)
 
+
+@pytest.fixture
 @app.route('/get_chat_history', methods=['POST'])
 def get_chat_history():
     user_id = flask_session.get('user_id')
@@ -167,7 +108,3 @@ def get_chat_history():
         })
 
     return jsonify(history)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)

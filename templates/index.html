@@ -3,115 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT-like Flask App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        body {
-            background-color: #f0f4f8;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 400px;
-            text-align: center;
-        }
-
-        .form-container {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"],
-        textarea {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #chat-section {
-            display: flex;
-            flex-direction: column;
-            height: 400px;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #conversation {
-            overflow-y: auto;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: #e8f4fc;
-            flex: 1;
-            text-align: left;
-        }
-
-        .user-message {
-            text-align: left;
-            margin: 5px 0;
-            background-color: #d1e7dd;
-            padding: 5px;
-            border-radius: 4px;
-        }
-
-        .bot-message {
-            text-align: right;
-            margin: 5px 0;
-            background-color: #f8d7da;
-            padding: 5px;
-            border-radius: 4px;
-        }
-
-        textarea {
-            resize: none;
-            height: 60px; /* Adjust height as needed */
-        }
-
-        #chat-history {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: #f9f9f9;
-            text-align: left;
-            display: none; /* Initially hidden */
-            overflow-y: auto; /* Allow scrolling if necessary */
-            max-height: 200px; /* Limit height of history display */
-        }
-    </style>
+    <title>OpenAI ChatGPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>ChatGPT-like Flask App</h1>
+        <h1>Welcome to my ChatGPT</h1>
 
         <div id="user-info" class="form-container">
             <form id="user-form">

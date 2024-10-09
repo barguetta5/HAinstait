@@ -14,9 +14,3 @@ def ask_openai(question):
     )
     return response.choices[0].message['content']
 
-# Example usage
-# if __name__ == "__main__":
-#     question = "What is the capital of France?"
-#     answer = ask_openai(question)
-#     print(f"Question: {question}\nAnswer: {answer}")
-

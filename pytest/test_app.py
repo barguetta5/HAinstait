@@ -1,5 +1,4 @@
 import warnings
-
 import pytest
 from app import app, db_session, ChatHistory  # Adjust the import based on your app structure
 

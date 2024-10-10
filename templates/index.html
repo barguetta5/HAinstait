@@ -12,7 +12,7 @@
 
         <div id="user-info" class="form-container">
             <form id="user-form">
-                <label for="user_id">ID:</label>
+                <label for="user_id">openAI key:</label>
                 <input type="text" id="user_id" name="user_id" required>
 
                 <label for="username">User name:</label>
@@ -54,6 +54,7 @@
             document.getElementById('chat-section').style.display = 'block';
         };
 
+
         // Handle chat submission
         document.getElementById('chat-form').onsubmit = async function(e) {
             e.preventDefault();
@@ -68,10 +69,12 @@
             });
 
             const data = await response.json();
+            alert(data.message);
             conversationDiv.innerHTML += `<div class="user-message"><strong>${username}:</strong> ${data.question}</div>`;
             conversationDiv.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.answer}</div>`;
             document.getElementById('user-input').value = '';
         };
+
 
         // Fetch chat history
         document.getElementById('fetch-history').onclick = async function() {

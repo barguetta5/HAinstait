@@ -85,7 +85,7 @@ body {
 
         textarea {
             resize: none;
-            height: 60px; /* Adjust height as needed */
+            height: 60px;
         }
 
         #chat-history {
@@ -97,5 +97,5 @@ body {
             text-align: left;
             display: none; /* Initially hidden */
             overflow-y: auto; /* Allow scrolling if necessary */
-            max-height: 200px; /* Limit height of history display */
+            max-height: 100px; /* Limit height of history display */
         }

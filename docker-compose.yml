@@ -1,0 +1,26 @@
+
+services:
+  flask_app:
+    container_name: flask_app
+    image: /flask_app:1.0.0
+    build: .
+    ports:
+      - 5000:5000
+    environment:
+      - DB_URL=postgresql://postgres:king1471@flask_db:localhost/InasitAsigment
+    depends_on:
+      - flask_db
+  flask_db:
+    container_name: flask_db
+    image: posrgress:12
+    build: .
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=king1471
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=InasitAsigment
+    volumes:
+      - pgdata:/var/lib/postgres/data
+volumes:
+  pgdatat: {}
